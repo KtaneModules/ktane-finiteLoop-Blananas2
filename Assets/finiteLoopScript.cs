@@ -628,8 +628,8 @@ public class finiteLoopScript : MonoBehaviour {
 
     void HardReset() {
         Debug.LogFormat("[Finite Loop #{0}] HARD RESET!", moduleId);
-        softResets = 0;
         SoftReset();
+        softResets = 0;
         InLoop = false;
         for (int p = 0; p < 6; p++) { //these are here so that it goes back to the initial state
             MiddleDotObjs[p].GetComponent<MeshRenderer>().material = ColorMats[0];
