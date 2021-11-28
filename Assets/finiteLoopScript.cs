@@ -473,7 +473,7 @@ public class finiteLoopScript : MonoBehaviour {
         if (!InLoop || moduleSolved) {
             return;
         }
-        if (x) {
+        if (x && !(LoopPointer > LoopPoints.Count())) { //!(LoopPointer > LoopPoints.Count()) fixes an IndexOutOfRangeException
             LoopPoints.Insert(LoopPointer, LoopTime);
             LoopActions.Insert(LoopPointer, s);
             Debug.LogFormat("[Finite Loop #{0}] {1} at {2} during reset {3}", moduleId, s, LoopTime, (int)softResets/2);
