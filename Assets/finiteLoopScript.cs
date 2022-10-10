@@ -473,7 +473,7 @@ public class finiteLoopScript : MonoBehaviour {
         if (!InLoop || moduleSolved) {
             return;
         }
-        if (x) {
+        if (x && !(LoopPointer > LoopPoints.Count())) { //!(LoopPointer > LoopPoints.Count()) fixes an IndexOutOfRangeException
             LoopPoints.Insert(LoopPointer, LoopTime);
             LoopActions.Insert(LoopPointer, s);
             Debug.LogFormat("[Finite Loop #{0}] {1} at {2} during reset {3}", moduleId, s, LoopTime, (int)softResets/2);
@@ -491,16 +491,16 @@ public class finiteLoopScript : MonoBehaviour {
             case "DOT 5 RELEASE": LoopObjFlags[4] = 0; MiddleDotObjs[4].GetComponent<MeshRenderer>().material = ColorMats[0]; break;
             case "DOT 6 HOLD": LoopObjFlags[5] = 1; MiddleDotObjs[5].GetComponent<MeshRenderer>().material = ColorMats[1]; break;
             case "DOT 6 RELEASE": LoopObjFlags[5] = 0; MiddleDotObjs[5].GetComponent<MeshRenderer>().material = ColorMats[0]; break;
-            case "SUBMIT PRESS": GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform); SubmitPress(); break;
-            case "SWITCH TOGGLE": GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.Switch, transform); LoopObjFlags[6] = (LoopObjFlags[6]+1)%4; SwitchFlip(LoopObjFlags[6]); break;
-            case "HARD RESET PRESS": GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonPress, transform); LoopObjFlags[7] += 1; HardResetPress(LoopObjFlags[7]); break;
+            case "SUBMIT PRESS": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform); } SubmitPress(); break;
+            case "SWITCH TOGGLE": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BriefcaseOpen, transform); } LoopObjFlags[6] = (LoopObjFlags[6]+1)%4; SwitchFlip(LoopObjFlags[6]); break;
+            case "HARD RESET PRESS": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonPress, transform); } LoopObjFlags[7] += 1; HardResetPress(LoopObjFlags[7]); break;
             case "GROUP BUTTON 1 HOLD": LoopObjFlags[8] = 1; ButtonGroupObjs[0].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[0] = true; break;
             case "GROUP BUTTON 1 RELEASE": LoopObjFlags[8] = 0; ButtonGroupObjs[0].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[0] = false; break;
             case "GROUP BUTTON 2 HOLD": LoopObjFlags[9] = 1; ButtonGroupObjs[1].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[1] = true; break;
             case "GROUP BUTTON 2 RELEASE": LoopObjFlags[9] = 0; ButtonGroupObjs[1].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[1] = false; break;
             case "GROUP BUTTON 3 HOLD": LoopObjFlags[10] = 1; ButtonGroupObjs[2].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[2] = true; break;
             case "GROUP BUTTON 3 RELEASE": LoopObjFlags[10] = 0; ButtonGroupObjs[2].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[2] = false; break;
-            case "KNOB TURN": GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BombDrop, transform); LoopObjFlags[11] = (LoopObjFlags[11]+1)%6; TurnKnob(LoopObjFlags[11]/2); break;
+            case "KNOB TURN": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BombDrop, transform); } LoopObjFlags[11] = (LoopObjFlags[11]+1)%6; TurnKnob(LoopObjFlags[11]/2); break;
             case "PANEL BUTTON 1 HOLD": LoopObjFlags[12] = 1; PanelButtonObjs[0].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[9] = true; break;
             case "PANEL BUTTON 1 RELEASE": LoopObjFlags[12] = 0; PanelButtonObjs[0].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[9] = false; break;
             case "PANEL BUTTON 2 HOLD": LoopObjFlags[13] = 1; PanelButtonObjs[1].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[10] = true; break;
@@ -628,8 +628,8 @@ public class finiteLoopScript : MonoBehaviour {
 
     void HardReset() {
         Debug.LogFormat("[Finite Loop #{0}] HARD RESET!", moduleId);
-        softResets = 0;
         SoftReset();
+        softResets = 0;
         InLoop = false;
         for (int p = 0; p < 6; p++) { //these are here so that it goes back to the initial state
             MiddleDotObjs[p].GetComponent<MeshRenderer>().material = ColorMats[0];
