@@ -102,7 +102,6 @@ public class finiteLoopScript : MonoBehaviour {
         ModuleSelectable.OnDefocus += delegate () { SoftReset(); };
 
         TestButton.OnInteract += delegate () { TestPress(); return false; };
-
         
         foreach (KMSelectable Arrow in Arrows) {
             Arrow.OnInteract += delegate () { ArrowPress(Arrow); return false; };
@@ -523,6 +522,7 @@ public class finiteLoopScript : MonoBehaviour {
 
     void SoftReset() {
         StopCoroutine(Loop);
+        ResetText.text = "HARD\nRESET";
         LoopNumber.text = " ";
         LoopPointer = 0;
         if (LoopTime != 0f) {
@@ -754,7 +754,6 @@ public class finiteLoopScript : MonoBehaviour {
             }
         }
     }
- 
 
     void TestPress() {
         InLoop = !InLoop;
@@ -763,5 +762,151 @@ public class finiteLoopScript : MonoBehaviour {
         } else {
             SoftReset();
         }
+    }
+
+    //twitch plays
+    bool TwitchShouldCancelCommand;
+    KMSelectable heldObj = null;
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
+    #pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        string[] actions = command.Split(new char[] { ',', ';' });
+        for (int i = 0; i < actions.Length; i++)
+        {
+            bool pass = false;
+            string[] actionSplit = actions[i].Split(' ');
+            if (actionSplit.Length == 2)
+            {
+                if (actionSplit[0].ToLower().EqualsAny("move", "m") && actionSplit[1].ToLower().EqualsAny("left", "l", "right", "r", "up", "u", "down", "d"))
+                    pass = true;
+                if (actionSplit[0].ToLower().EqualsAny("hold", "h", "tap", "t") && actionSplit[1].ToLower().EqualsAny("1", "2", "3", "4", "5", "6", "7"))
+                    pass = true;
+                float temp;
+                if (actionSplit[0].ToLower().EqualsAny("wait", "w") && float.TryParse(actionSplit[1], out temp) && temp > 0f)
+                    pass = true;
+            }
+            else if (actionSplit.Length == 1)
+            {
+                if (actionSplit[0].ToLower().EqualsAny("release", "r"))
+                    pass = true;
+            }
+            if (!pass)
+                yield break;
+        }
+        yield return null;
+        for (int i = 0; i < actions.Length; i++)
+        {
+            string[] actionSplit = actions[i].Split(' ');
+            switch (actionSplit[0].ToLower())
+            {
+                case "move":
+                case "m":
+                    if (heldObj == null)
+                        Arrows["uldr".IndexOf(actionSplit[1].ToLower())].OnInteract();
+                    break;
+                case "release":
+                case "r":
+                    if (heldObj != null)
+                    {
+                        heldObj.OnInteractEnded();
+                        heldObj = null;
+                    }
+                    break;
+                case "wait":
+                case "w":
+                    float t = 0f;
+                    while (t < float.Parse(actionSplit[1]))
+                    {
+                        t += Time.deltaTime;
+                        yield return null;
+                        if (TwitchShouldCancelCommand)
+                            goto defocus;
+                    }
+                    break;
+                default:
+                    List<KMSelectable> roomSelectables = new List<KMSelectable>();
+                    switch (interestingMaze[curPos])
+                    {
+                        case 'Y': roomSelectables.AddRange(MiddleDots); roomSelectables.Add(MiddleSubmit); break;
+                        case 'X': roomSelectables.Add(DiagramSwitch); break;
+                        case 'Z': roomSelectables.Add(HardResetButton); break;
+                        case 'a': roomSelectables.AddRange(ButtonGroup); break;
+                        case 'b': roomSelectables.Add(Knob); break;
+                        case 'c': roomSelectables.AddRange(PanelButtons); break;
+                    }
+                    int index = int.Parse(actionSplit[1]);
+                    if (index <= roomSelectables.Count)
+                    {
+                        if (actionSplit[0].ToLower().EqualsAny("tap", "t") && heldObj == null)
+                        {
+                            roomSelectables[index - 1].OnInteract();
+                            if (roomSelectables[index - 1].OnInteractEnded != null)
+                                roomSelectables[index - 1].OnInteractEnded();
+                        }
+                        else if (heldObj == null && roomSelectables[index - 1].OnInteractEnded != null)
+                        {
+                            roomSelectables[index - 1].OnInteract();
+                            heldObj = roomSelectables[index - 1];
+                        }
+                    }
+                    break;
+            }
+            yield return null;
+        }
+        defocus:
+        ModuleSelectable.OnDefocus();
+        if (TwitchShouldCancelCommand)
+            yield return "cancelled";
+    }
+
+    private string[] FREAKINBRAILLE = { "1", "12", "14", "145", "15", "124", "1245", "125", "24", "245", "13", "123", "134", "1345", "135", "1234", "12345", "1235", "234", "2345", "136", "1236", "2456", "1346", "13456", "1356" };
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        if (InLoop)
+        {
+            StopAllCoroutines();
+            moduleSolved = true;
+            GetComponent<KMBombModule>().HandlePass();
+            yield break;
+        }
+        ModuleSelectable.OnFocus();
+        if (LoopActions.Contains("DOT 1 HOLD") || LoopActions.Contains("DOT 2 HOLD") || LoopActions.Contains("DOT 3 HOLD") || LoopActions.Contains("DOT 4 HOLD") || LoopActions.Contains("DOT 5 HOLD") || LoopActions.Contains("DOT 6 HOLD"))
+        {
+            Arrows[2].OnInteract();
+            yield return new WaitForSeconds(.1f);
+            HardResetButton.OnInteract();
+            yield return new WaitForSeconds(.1f);
+            HardResetButton.OnInteract();
+            yield return new WaitForSeconds(.1f);
+        }
+        ModuleSelectable.OnDefocus();
+        for (int i = 0; i < 6; i++)
+        {
+            ModuleSelectable.OnFocus();
+            for (int j = 0; j < 6; j++)
+            {
+                bool held = false;
+                if (FREAKINBRAILLE[chosenWord[j] - 'A'].Contains((i + 1).ToString()))
+                {
+                    MiddleDots[i].OnInteract();
+                    held = true;
+                }
+                yield return new WaitForSeconds(.2f);
+                if (held)
+                    MiddleDots[i].OnInteractEnded();
+                yield return new WaitForSeconds(.2f);
+            }
+            ModuleSelectable.OnDefocus();
+        }
+        ModuleSelectable.OnFocus();
+        yield return new WaitForSeconds(.1f);
+        for (int i = 0; i < 6; i++)
+        {
+            MiddleSubmit.OnInteract();
+            yield return new WaitForSeconds(.4f);
+        }
+        ModuleSelectable.OnDefocus();
     }
 }
