@@ -768,7 +768,7 @@ public class finiteLoopScript : MonoBehaviour {
     bool TwitchShouldCancelCommand;
     KMSelectable heldObj = null;
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
+    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order (unless you are in the middle room in which it is braille order)] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
@@ -871,41 +871,53 @@ public class finiteLoopScript : MonoBehaviour {
             GetComponent<KMBombModule>().HandlePass();
             yield break;
         }
-        ModuleSelectable.OnFocus();
         if (LoopActions.Contains("DOT 1 HOLD") || LoopActions.Contains("DOT 2 HOLD") || LoopActions.Contains("DOT 3 HOLD") || LoopActions.Contains("DOT 4 HOLD") || LoopActions.Contains("DOT 5 HOLD") || LoopActions.Contains("DOT 6 HOLD"))
         {
+            ModuleSelectable.OnFocus();
             Arrows[2].OnInteract();
             yield return new WaitForSeconds(.1f);
             HardResetButton.OnInteract();
             yield return new WaitForSeconds(.1f);
             HardResetButton.OnInteract();
             yield return new WaitForSeconds(.1f);
-        }
-        ModuleSelectable.OnDefocus();
-        for (int i = 0; i < 6; i++)
-        {
-            ModuleSelectable.OnFocus();
-            for (int j = 0; j < 6; j++)
-            {
-                bool held = false;
-                if (FREAKINBRAILLE[chosenWord[j] - 'A'].Contains((i + 1).ToString()))
-                {
-                    MiddleDots[i].OnInteract();
-                    held = true;
-                }
-                yield return new WaitForSeconds(.2f);
-                if (held)
-                    MiddleDots[i].OnInteractEnded();
-                yield return new WaitForSeconds(.2f);
-            }
             ModuleSelectable.OnDefocus();
         }
+        for (int i = 0; i < 6; i++)
+        {
+            int funny = -1;
+            for (int j = 0; j < 6; j++)
+            {
+                if (FREAKINBRAILLE[chosenWord[j] - 'A'].Contains((i + 1).ToString()))
+                    funny = j;
+            }
+            if (funny != -1)
+            {
+                ModuleSelectable.OnFocus();
+                for (int j = 0; j < funny + 1; j++)
+                {
+                    bool held = false;
+                    if (FREAKINBRAILLE[chosenWord[j] - 'A'].Contains((i + 1).ToString()))
+                    {
+                        MiddleDots[i].OnInteract();
+                        held = true;
+                    }
+                    yield return new WaitForSeconds(1f);
+                    if (held)
+                        MiddleDots[i].OnInteractEnded();
+                    yield return new WaitForSeconds(1f);
+                }
+                ModuleSelectable.OnDefocus();
+            }
+        }
         ModuleSelectable.OnFocus();
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(.5f);
         for (int i = 0; i < 6; i++)
         {
             MiddleSubmit.OnInteract();
-            yield return new WaitForSeconds(.4f);
+            if (i != 5)
+                yield return new WaitForSeconds(2f);
+            else
+                yield return new WaitForSeconds(.5f);
         }
         ModuleSelectable.OnDefocus();
     }
