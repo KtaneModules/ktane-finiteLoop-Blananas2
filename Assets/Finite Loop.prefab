@@ -467,7 +467,7 @@ GameObject:
   - component: {fileID: 114528846528402116}
   - component: {fileID: 114021480353680518}
   m_Layer: 0
-  m_Name: TR Pbutton
+  m_Name: BL Pbutton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1753,8 +1753,8 @@ Transform:
   m_LocalScale: {x: 0.08, y: 0.01, z: 0.08}
   m_Children:
   - {fileID: 4430930328090066}
-  - {fileID: 4751808057834118}
   - {fileID: 4534779714009254}
+  - {fileID: 4751808057834118}
   - {fileID: 4931366707499166}
   m_Father: {fileID: 4257340207950476}
   m_RootOrder: 8
@@ -1931,7 +1931,7 @@ Transform:
   m_Children:
   - {fileID: 4564665620815318}
   m_Father: {fileID: 4837934495271350}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4534051412005784
 Transform:
@@ -1959,7 +1959,7 @@ Transform:
   m_Children:
   - {fileID: 4210300524139622}
   m_Father: {fileID: 4388230675868396}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4564665620815318
 Transform:
@@ -2134,7 +2134,7 @@ Transform:
   m_Children:
   - {fileID: 4606337449427122}
   m_Father: {fileID: 4837934495271350}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4723493171363408
 Transform:
@@ -2161,7 +2161,7 @@ Transform:
   m_Children:
   - {fileID: 4395594596025658}
   m_Father: {fileID: 4388230675868396}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4762291497486312
 Transform:
@@ -2226,8 +2226,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4328099272114130}
-  - {fileID: 4527569017851586}
   - {fileID: 4688369771017356}
+  - {fileID: 4527569017851586}
   m_Father: {fileID: 4257340207950476}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5507,21 +5507,21 @@ MonoBehaviour:
   ResetText: {fileID: 102828662190290146}
   ButtonGroup:
   - {fileID: 114623886877390592}
-  - {fileID: 114530807021312022}
   - {fileID: 114093476001743700}
+  - {fileID: 114530807021312022}
   ButtonGroupObjs:
   - {fileID: 1542777764117654}
-  - {fileID: 1378327435911550}
   - {fileID: 1809934569613330}
+  - {fileID: 1378327435911550}
   Knob: {fileID: 114056537061948382}
   PanelButtons:
   - {fileID: 114574453572023928}
-  - {fileID: 114406257562972262}
   - {fileID: 114528846528402116}
+  - {fileID: 114406257562972262}
   PanelButtonObjs:
   - {fileID: 1855475408381522}
-  - {fileID: 1197638235096532}
   - {fileID: 1307061719334024}
+  - {fileID: 1197638235096532}
   PanelDisplay: {fileID: 102686916923769122}
   EndText:
   - {fileID: 102662105468425214}
