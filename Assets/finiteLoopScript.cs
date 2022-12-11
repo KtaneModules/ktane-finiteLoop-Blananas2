@@ -768,7 +768,7 @@ public class finiteLoopScript : MonoBehaviour {
     bool TwitchShouldCancelCommand;
     KMSelectable heldObj = null;
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order (unless you are in the middle room in which it is braille order)] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
+    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order (unless you are at C3, in which case it is Braille order)] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
