@@ -816,7 +816,7 @@ public class finiteLoopScript : MonoBehaviour {
                         t += Time.deltaTime;
                         yield return null;
                         if (TwitchShouldCancelCommand)
-                            goto defocus;
+                            goto exit;
                     }
                     break;
                 default:
@@ -849,8 +849,7 @@ public class finiteLoopScript : MonoBehaviour {
             }
             yield return null;
         }
-        defocus:
-        ModuleSelectable.OnDefocus();
+        exit:
         if (TwitchShouldCancelCommand)
             yield return "cancelled";
     }
