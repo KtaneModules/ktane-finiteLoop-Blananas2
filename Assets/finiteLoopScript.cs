@@ -50,8 +50,10 @@ public class finiteLoopScript : MonoBehaviour {
     private bool InLoop = false;
     Coroutine Loop;
     private float LoopTime = 0f;
+    private int ResetCount = 0;
     private List<float> LoopPoints = new List<float> {}; //These are when the events happen.
     private List<string> LoopActions = new List<string> {}; //Which event happened.
+    private List<int> LoopRuns = new List<int> {}; //Which run through the loop it occured in.
     private int LoopPointer = 0;
     private int[] LoopObjFlags = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; //States of objects in the loop. See block below.
     private bool[] LoopDoorFlags = {false, false, false, true, false, false, false, false, false, true, false, false}; 
@@ -82,7 +84,6 @@ public class finiteLoopScript : MonoBehaviour {
     private string curOri;
     private int curPos = 12;
     private string interestingMaze = "";
-    private int softResets = 0;
     private string[] coordSet = {"A1", "B1", "C1", "D1", "E1", "A2", "B2", "C2", "D2", "E2", "A3", "B3", "C3", "D3", "E3", "A4", "B4", "C4", "D4", "E4", "A5", "B5", "C5", "D5", "E5" };
     private int offset;
     private string[] ciphers = {"A1Z26", "CAESAR", "ATBASH", "AFFINE", "VIGENÈRE", "MODERN"};
@@ -451,7 +452,7 @@ public class finiteLoopScript : MonoBehaviour {
             return;
         }
         InLoop = true;
-        LoopNumber.text = ((int)(softResets/2)).ToString();
+        LoopNumber.text = ResetCount.ToString();
         Loop = StartCoroutine(LoopCoro());
     }
 
@@ -461,7 +462,9 @@ public class finiteLoopScript : MonoBehaviour {
             if (LoopPointer >= LoopPoints.Count()) {
                 //lamo
             } else if (LoopTime > LoopPoints[LoopPointer]) {
-                PressAnything(false, LoopActions[LoopPointer]);
+                if (LoopRuns[LoopPointer] != ResetCount) { //Fix doubling bug the mod had to deal with for over a year. I wish that was a joke.
+                    PressAnything(false, LoopActions[LoopPointer]);
+                }
                 LoopPointer += 1;
             }
             yield return null;
@@ -475,7 +478,8 @@ public class finiteLoopScript : MonoBehaviour {
         if (x && !(LoopPointer > LoopPoints.Count())) { //!(LoopPointer > LoopPoints.Count()) fixes an IndexOutOfRangeException
             LoopPoints.Insert(LoopPointer, LoopTime);
             LoopActions.Insert(LoopPointer, s);
-            Debug.LogFormat("[Finite Loop #{0}] {1} at {2} during reset {3}", moduleId, s, LoopTime, (int)softResets/2);
+            LoopRuns.Insert(LoopPointer, ResetCount);
+            Debug.LogFormat("[Finite Loop #{0}] {1} at {2} during reset {3}", moduleId, s, LoopTime, ResetCount);
         }
         switch (s) {
             case "DOT 1 HOLD": LoopObjFlags[0] = 1; MiddleDotObjs[0].GetComponent<MeshRenderer>().material = ColorMats[1]; break;
@@ -491,7 +495,7 @@ public class finiteLoopScript : MonoBehaviour {
             case "DOT 6 HOLD": LoopObjFlags[5] = 1; MiddleDotObjs[5].GetComponent<MeshRenderer>().material = ColorMats[1]; break;
             case "DOT 6 RELEASE": LoopObjFlags[5] = 0; MiddleDotObjs[5].GetComponent<MeshRenderer>().material = ColorMats[0]; break;
             case "SUBMIT PRESS": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform); } SubmitPress(); break;
-            case "SWITCH TOGGLE": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BriefcaseOpen, transform); } LoopObjFlags[6] = (LoopObjFlags[6]+1)%4; SwitchFlip(LoopObjFlags[6]); break;
+            case "SWITCH TOGGLE": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BriefcaseOpen, transform); } LoopObjFlags[6] += 1; SwitchFlip(LoopObjFlags[6]%2); break;
             case "HARD RESET PRESS": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BigButtonPress, transform); } LoopObjFlags[7] += 1; HardResetPress(LoopObjFlags[7]); break;
             case "GROUP BUTTON 1 HOLD": LoopObjFlags[8] = 1; ButtonGroupObjs[0].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[0] = true; break;
             case "GROUP BUTTON 1 RELEASE": LoopObjFlags[8] = 0; ButtonGroupObjs[0].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[0] = false; break;
@@ -499,7 +503,7 @@ public class finiteLoopScript : MonoBehaviour {
             case "GROUP BUTTON 2 RELEASE": LoopObjFlags[9] = 0; ButtonGroupObjs[1].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[1] = false; break;
             case "GROUP BUTTON 3 HOLD": LoopObjFlags[10] = 1; ButtonGroupObjs[2].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[2] = true; break;
             case "GROUP BUTTON 3 RELEASE": LoopObjFlags[10] = 0; ButtonGroupObjs[2].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[2] = false; break;
-            case "KNOB TURN": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BombDrop, transform); } LoopObjFlags[11] = (LoopObjFlags[11]+1)%6; TurnKnob(LoopObjFlags[11]/2); break;
+            case "KNOB TURN": if (x) { GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.BombDrop, transform); } LoopObjFlags[11] = (LoopObjFlags[11]+1)%3; TurnKnob(LoopObjFlags[11]); break;
             case "PANEL BUTTON 1 HOLD": LoopObjFlags[12] = 1; PanelButtonObjs[0].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[9] = true; break;
             case "PANEL BUTTON 1 RELEASE": LoopObjFlags[12] = 0; PanelButtonObjs[0].GetComponent<MeshRenderer>().material = ColorMats[0]; LoopDoorFlags[9] = false; break;
             case "PANEL BUTTON 2 HOLD": LoopObjFlags[13] = 1; PanelButtonObjs[1].GetComponent<MeshRenderer>().material = ColorMats[1]; LoopDoorFlags[10] = true; break;
@@ -526,15 +530,19 @@ public class finiteLoopScript : MonoBehaviour {
         LoopNumber.text = " ";
         LoopPointer = 0;
         if (LoopTime != 0f) {
-            Debug.LogFormat("[Finite Loop #{0}] Reset {1} lasted for {2}", moduleId, (int)softResets/2, LoopTime);
+            Debug.LogFormat("[Finite Loop #{0}] Reset {1} lasted for {2}", moduleId, ResetCount, LoopTime);
         }
         LoopTime = 0f;
-        softResets += 1;
+        ResetCount += 1;
         curPos = 12;
         LoopAnswer = "";
         MiddleWord.text = "";
         SwitchObject.transform.localPosition = new Vector3( -0.057f, 0.029f, 0.032f);
         SwitchObject.transform.localRotation = Quaternion.Euler(-30f, 0f, 0f);
+        MazeObj.sprite = MazeSprites[mazeIx+1];
+        Diagram[0].text = diagramTexts[0];
+        Diagram[1].text = " ";
+        PanelDisplay.text = "0";
         KnobObj.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
         for (int k = 0; k < LoopObjFlags.Count(); k++) {
             LoopObjFlags[k] = 0;
@@ -553,14 +561,13 @@ public class finiteLoopScript : MonoBehaviour {
                 MiddleDotObjs[k].GetComponent<MeshRenderer>().material = ColorMats[0];
             }
         }
-        CursedDuality((int)softResets/2);
+        CursedDuality(ResetCount);
         ShowRoom();
     }
 
     void SubmitPress() {
         string nuts = "123456";
         string gex = "";
-        string realAnswer = "";
         for (int q = 0; q < 6; q++) {
             if (LoopObjFlags[q] == 1) {
                 gex += nuts[q];
@@ -595,41 +602,32 @@ public class finiteLoopScript : MonoBehaviour {
             case "1356": LoopAnswer += "Z"; break;
             default: LoopAnswer += "?"; break;
         }
-        switch (LoopAnswer.Length) {
-            case 2: realAnswer = LoopAnswer[0].ToString(); break;
-            case 4: realAnswer = LoopAnswer[0].ToString() + LoopAnswer[2]; break;
-            case 6: realAnswer = LoopAnswer[0].ToString() + LoopAnswer[2] + LoopAnswer[4]; break;
-            case 8: realAnswer = LoopAnswer[0].ToString() + LoopAnswer[2] + LoopAnswer[4] + LoopAnswer[6]; break;
-            case 10: realAnswer = LoopAnswer[0].ToString() + LoopAnswer[2] + LoopAnswer[4] + LoopAnswer[6] + LoopAnswer[8]; break;
-            case 12: realAnswer = LoopAnswer[0].ToString() + LoopAnswer[2] + LoopAnswer[4] + LoopAnswer[6] + LoopAnswer[8] + LoopAnswer[10]; break;
-            default: /* whatever */ break;
-        }
-        MiddleWord.text = realAnswer;
-        if (realAnswer.Length == 6) {
-            if (realAnswer == chosenWord) {
+        MiddleWord.text = LoopAnswer;
+        if (LoopAnswer.Length == 6) {
+            if (LoopAnswer == chosenWord) {
                 moduleSolved = true;
                 GetComponent<KMBombModule>().HandlePass();
-                Debug.LogFormat("[Finite Loop #{0}] {1} submitted, that is correct! Module solved!", moduleId, realAnswer);
+                Debug.LogFormat("[Finite Loop #{0}] {1} submitted, that is correct! Module solved!", moduleId, LoopAnswer);
             } else {
                 GetComponent<KMBombModule>().HandleStrike();
-                Debug.LogFormat("[Finite Loop #{0}] {1} submitted, that is incorrect. Strike! Hard resetting...", moduleId, realAnswer);
+                Debug.LogFormat("[Finite Loop #{0}] {1} submitted, that is incorrect. Strike! Hard resetting...", moduleId, LoopAnswer);
                 HardReset();
             }
         }
     }
 
     void HardResetPress(int r) {
-        if (r < 3) {
-            ResetText.text = "ARE YOU\nSURE?";
-        } else {
+        if (r > 1) {
             HardReset();
+        } else {
+            ResetText.text = "ARE YOU\nSURE?";
         }
     }
 
     void HardReset() {
         Debug.LogFormat("[Finite Loop #{0}] HARD RESET!", moduleId);
         SoftReset();
-        softResets = 0;
+        ResetCount = 0;
         InLoop = false;
         for (int p = 0; p < 6; p++) { //these are here so that it goes back to the initial state
             MiddleDotObjs[p].GetComponent<MeshRenderer>().material = ColorMats[0];
@@ -644,7 +642,7 @@ public class finiteLoopScript : MonoBehaviour {
     }
 
     void SwitchFlip(int d) {
-        if (d != 2) {
+        if (d == 0) {
             SwitchObject.transform.localPosition = new Vector3( -0.057f, 0.029f, 0.032f);
             SwitchObject.transform.localRotation = Quaternion.Euler(-30f, 0f, 0f);
             //TOP
@@ -671,11 +669,11 @@ public class finiteLoopScript : MonoBehaviour {
     }
 
     void CursedDuality(int r) {
-        switch (r % 3) {
+        switch (r) {
             case 0: DualityObj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f); LoopDoorFlags[9] = true; break;
             case 1: DualityObj.transform.localRotation = Quaternion.Euler(90f, 120f, 0f); LoopDoorFlags[10] = true; break;
             case 2: DualityObj.transform.localRotation = Quaternion.Euler(90f, 240f, 0f); LoopDoorFlags[11] = true; break;
-            default: Debug.Log("Something has gone wrong! switch(r % 3)"); break;
+            default: Debug.Log("Something has gone wrong! switch(r)"); break;
         }
     }
     
@@ -768,7 +766,7 @@ public class finiteLoopScript : MonoBehaviour {
     bool TwitchShouldCancelCommand;
     KMSelectable heldObj = null;
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order (unless you are in the middle room in which it is braille order)] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
+    private readonly string TwitchHelpMessage = @"!{0} move/m <left/l/right/r/up/u/down/d> [Move through rooms] | !{0} hold/h/tap/t <#> [Holds/taps object '#' in reading order (unless you are at C3, in which case it is Braille order)] | !{0} release/r [Releases the held object] | !{0} wait/w <#> [Waits for '#' seconds] | Each individual command will select the module, execute the specified action, and then deselect | To perform multiple actions in one command, separate each with commas or semicolons";
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
