@@ -99,7 +99,7 @@ public class finiteLoopScript : MonoBehaviour {
         moduleId = moduleIdCounter++;
         
         ModuleSelectable.OnFocus += delegate () { StartLoop(); };
-        ModuleSelectable.OnDefocus += delegate () { SoftReset(); };
+        ModuleSelectable.OnDefocus += delegate () { if (InLoop) { SoftReset(); } };
 
         TestButton.OnInteract += delegate () { TestPress(); return false; };
         
@@ -523,6 +523,7 @@ public class finiteLoopScript : MonoBehaviour {
     }
 
     void SoftReset() {
+        InLoop = false;
         StopCoroutine(Loop);
         ResetText.text = "HARD\nRESET";
         LoopNumber.text = " ";
@@ -559,7 +560,7 @@ public class finiteLoopScript : MonoBehaviour {
                 MiddleDotObjs[k].GetComponent<MeshRenderer>().material = ColorMats[0];
             }
         }
-        CursedDuality(ResetCount);
+        CursedDuality(ResetCount%3);
         ShowRoom();
     }
 
@@ -626,7 +627,6 @@ public class finiteLoopScript : MonoBehaviour {
         Debug.LogFormat("[Finite Loop #{0}] HARD RESET!", moduleId);
         SoftReset();
         ResetCount = 0;
-        InLoop = false;
         for (int p = 0; p < 6; p++) { //these are here so that it goes back to the initial state
             MiddleDotObjs[p].GetComponent<MeshRenderer>().material = ColorMats[0];
             if (p < 3) {

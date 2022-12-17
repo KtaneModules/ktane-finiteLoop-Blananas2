@@ -94,8 +94,9 @@ GameObject:
   - component: {fileID: 33882340261206748}
   - component: {fileID: 23301341245925312}
   - component: {fileID: 114178304238208046}
+  - component: {fileID: 114358874606128334}
   m_Layer: 0
-  m_Name: TestButton
+  m_Name: DumbassButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1574,8 +1575,8 @@ Transform:
   - {fileID: 4815084074406750}
   - {fileID: 4861150222228920}
   - {fileID: 4097672491426264}
-  - {fileID: 4656314541231426}
   - {fileID: 4522385934238656}
+  - {fileID: 4656314541231426}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1917,7 +1918,7 @@ Transform:
   m_LocalScale: {x: 0.0015000001, y: 0.0015000018, z: 0.10000012}
   m_Children: []
   m_Father: {fileID: 4257340207950476}
-  m_RootOrder: 13
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!4 &4527569017851586
 Transform:
@@ -2079,7 +2080,7 @@ Transform:
   m_Children:
   - {fileID: 4871609223921732}
   m_Father: {fileID: 4257340207950476}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!4 &4669286105138642
 Transform:
@@ -2649,7 +2650,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: a3ff9199dd23a464487fdce3b39bf59c, type: 2}
+  - {fileID: 2100000, guid: 70a568b2831eea343b56f9e1ffb7beb2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5093,6 +5094,19 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1742285803263152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShaderNames:
+  - KT/Mobile/DiffuseTint
+--- !u!114 &114358874606128334
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1055684754702088}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1005838349, guid: 45b809be76fd7a3468b6f517bced6f28, type: 3}
