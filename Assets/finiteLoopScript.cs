@@ -45,7 +45,6 @@ public class finiteLoopScript : MonoBehaviour {
     public TextMesh[] EndText; //Index, Key, Cipher, Letter
     public TextMesh LoopNumber;
 
-    //I HAVE NO FUCKING CLUE ON HOW THIS SHOULD WORK HELP ME
     public KMSelectable TestButton; //bc testharness go brrr
     private bool InLoop = false;
     Coroutine Loop;
@@ -261,7 +260,6 @@ public class finiteLoopScript : MonoBehaviour {
         wordIx = UnityEngine.Random.Range(0, words.Count());
         chosenWord = words[wordIx];
         Debug.LogFormat("[Finite Loop #{0}] Word is {1}", moduleId, chosenWord);
-        //Debug.Log(chosenWord);
         string a1z26 = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         string affine = "ZABCDEFGHIJKLMNOPQRSTUVWXY";
         string modern = "QWERTYUIOPASDFGHJKLZXCVBNM";
@@ -642,17 +640,15 @@ public class finiteLoopScript : MonoBehaviour {
     }
 
     void SwitchFlip(int d) {
-        if (d == 0) {
+        if (d == 0) { //TOP
             SwitchObject.transform.localPosition = new Vector3( -0.057f, 0.029f, 0.032f);
             SwitchObject.transform.localRotation = Quaternion.Euler(-30f, 0f, 0f);
-            //TOP
             MazeObj.sprite = MazeSprites[mazeIx+1];
             Diagram[0].text = diagramTexts[0];
             Diagram[1].text = " ";
-        } else {
+        } else { //BOTTOM
             SwitchObject.transform.localPosition = new Vector3( -0.057f, 0.029f, -0.004f);
             SwitchObject.transform.localRotation = Quaternion.Euler(-30f, -180f, 0f);
-            //BOTTOM
             MazeObj.sprite = MazeSprites[0];
             Diagram[0].text = " ";
             Diagram[1].text = diagramTexts[1];
