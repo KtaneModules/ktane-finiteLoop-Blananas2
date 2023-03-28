@@ -850,6 +850,11 @@ public class finiteLoopScript : MonoBehaviour {
             yield return null;
         }
         exit:
+        if (heldObj != null)
+        {
+            heldObj.OnInteractEnded();
+            heldObj = null;
+        }
         if (TwitchShouldCancelCommand)
             yield return "cancelled";
     }
