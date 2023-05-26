@@ -798,7 +798,7 @@ public class finiteLoopScript : MonoBehaviour {
                 case "move":
                 case "m":
                     if (heldObj == null)
-                        Arrows["uldr".IndexOf(actionSplit[1].ToLower())].OnInteract();
+                        Arrows["uldr".IndexOf(actionSplit[1].ToLower()[0])].OnInteract();
                     break;
                 case "release":
                 case "r":
