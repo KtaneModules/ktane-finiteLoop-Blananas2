@@ -604,6 +604,7 @@ public class finiteLoopScript : MonoBehaviour {
         MiddleWord.text = LoopAnswer;
         if (LoopAnswer.Length == 6) {
             if (LoopAnswer == chosenWord) {
+                Audio.PlaySoundAtTransform("seed_complete_main", transform);
                 moduleSolved = true;
                 GetComponent<KMBombModule>().HandlePass();
                 Debug.LogFormat("[Finite Loop #{0}] {1} submitted, that is correct! Module solved!", moduleId, LoopAnswer);
