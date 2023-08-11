@@ -452,9 +452,11 @@ public class finiteLoopScript : MonoBehaviour {
         InLoop = true;
         LoopNumber.text = ResetCount.ToString();
         Loop = StartCoroutine(LoopCoro());
+        Debug.LogFormat("<Finite Loop #{0}> I called all the loop stuff", moduleId);
     }
 
     IEnumerator LoopCoro() {
+        Debug.LogFormat("<Finite Loop #{0}> Loop coroutine started", moduleId);
         while (true) {
             LoopTime += Time.deltaTime;
             if (LoopPointer >= LoopPoints.Count()) {
@@ -462,6 +464,7 @@ public class finiteLoopScript : MonoBehaviour {
             } else if (LoopTime > LoopPoints[LoopPointer]) {
                 if (LoopRuns[LoopPointer] != ResetCount) { //Fix doubling bug the mod had to deal with for over a year. I wish that was a joke.
                     PressAnything(false, LoopActions[LoopPointer]);
+                    Debug.LogFormat("<Finite Loop #{0}> Press the stuff cause we should probably", moduleId);
                 }
                 LoopPointer += 1;
             }
@@ -532,6 +535,7 @@ public class finiteLoopScript : MonoBehaviour {
             Debug.LogFormat("[Finite Loop #{0}] Reset {1} lasted for {2}", moduleId, ResetCount, LoopTime);
         }
         LoopTime = 0f;
+        Debug.LogFormat("<Finite Loop #{0}> Loop time reset", moduleId);
         ResetCount += 1;
         curPos = 12;
         LoopAnswer = "";
@@ -767,6 +771,7 @@ public class finiteLoopScript : MonoBehaviour {
     #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
+        Debug.LogFormat("<Finite Loop #{0}> TP command started", moduleId);
         string[] actions = command.Split(new char[] { ',', ';' });
         for (int i = 0; i < actions.Length; i++)
         {
@@ -858,6 +863,7 @@ public class finiteLoopScript : MonoBehaviour {
         }
         if (TwitchShouldCancelCommand)
             yield return "cancelled";
+        Debug.LogFormat("<Finite Loop #{0}> TP command ended", moduleId);
     }
 
     private string[] FREAKINBRAILLE = { "1", "12", "14", "145", "15", "124", "1245", "125", "24", "245", "13", "123", "134", "1345", "135", "1234", "12345", "1235", "234", "2345", "136", "1236", "2456", "1346", "13456", "1356" };
